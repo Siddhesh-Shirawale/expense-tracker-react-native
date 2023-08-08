@@ -32,7 +32,6 @@ const ManageExpense = ({ route, navigation }) => {
   };
 
   const confirmHandler = (inputValues) => {
-    console.log(inputValues);
     if (isEditing) {
       expContext.updateExpense(editorExpenseId, inputValues);
     } else {
