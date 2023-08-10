@@ -4,7 +4,13 @@ const endPoint = "http://localhost:8000";
 
 export const storeExpense = async (expenseData) => {
   try {
-    const response = await axios.post(`${endPoint}/api/expense`, expenseData);
+    const response = await axios.post(
+      `http://103.167.176.183:8000/api/expense`,
+      expenseData
+    );
+
+    console.log(response);
+
     return response;
   } catch (error) {
     return error;
@@ -20,7 +26,7 @@ export const deleteExpense = async (expenseId) => {
   }
 };
 
-export const getExpenses = async (expenseId) => {
+export const getExpenses = async () => {
   try {
     const response = await axios.get(`${endPoint}/api/expense`);
     return response;
@@ -31,7 +37,7 @@ export const getExpenses = async (expenseId) => {
 
 export const updateExpense = async (expenseData) => {
   try {
-    const response = await axios.delete(`${endPoint}/api/expense`, expenseData);
+    const response = await axios.put(`${endPoint}/api/expense`, expenseData);
     return response;
   } catch (error) {
     return error;

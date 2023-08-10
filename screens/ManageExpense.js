@@ -1,10 +1,10 @@
 import React, { useContext, useLayoutEffect } from "react";
-import { StyleSheet, Text, TextInput, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import IconButton from "../components/UI/IconButton";
 import { GlobalStyles } from "../contants/styles";
-import Button from "../components/UI/Button";
 import { ExpensesContext } from "./store/expenses-context";
 import ExpenseForm from "../components/ManageExpense/ExpenseForm";
+import { storeExpense } from "../util/http";
 
 const ManageExpense = ({ route, navigation }) => {
   const editorExpenseId = route.params?.expenseId;
@@ -31,10 +31,24 @@ const ManageExpense = ({ route, navigation }) => {
     navigation.goBack();
   };
 
-  const confirmHandler = (inputValues) => {
+  const confirmHandler = async (inputValues) => {
     if (isEditing) {
       expContext.updateExpense(editorExpenseId, inputValues);
     } else {
+      try {
+        const response = await storeExpense(inputValues);
+        const response1 = storeExpense(inputValues);
+
+        console.log("response", response);
+        console.log("response1", response1);
+
+        if (response?.["success"]) {
+          console.log(response?.["data"]);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+
       expContext.addExpense(inputValues);
     }
     navigation.goBack();
