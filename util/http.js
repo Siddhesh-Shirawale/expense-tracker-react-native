@@ -1,18 +1,16 @@
 import axios from "axios";
 
-const endPoint = "http://localhost:8000";
+const endPoint = "http://192.168.1.104:8000";
 
 export const storeExpense = async (expenseData) => {
   try {
-    const response = await axios.post(
-      `http://103.167.176.183:8000/api/expense`,
-      expenseData
-    );
-
-    console.log(response);
+    const response = await axios.post(`${endPoint}/api/expense`, expenseData);
+    // `http://103.167.176.183:8000/api/expense`,
 
     return response;
   } catch (error) {
+    console.log(error?.["message"]);
+
     return error;
   }
 };
@@ -29,8 +27,24 @@ export const deleteExpense = async (expenseId) => {
 export const getExpenses = async () => {
   try {
     const response = await axios.get(`${endPoint}/api/expense`);
-    return response;
+
+    const expenses = [];
+
+    console.log(response?.["data"]);
+
+    for (const key in response?.["data"]) {
+      const expenseObj = {
+        id: response?.data[key].id,
+        amount: response?.data[key].amount,
+        date: new Date(response?.["data"][key].date),
+        description: new Date(response?.["data"][key].description),
+      };
+      expenses.push(expenseObj);
+    }
+
+    return expenses;
   } catch (error) {
+    console.log(error);
     return error;
   }
 };

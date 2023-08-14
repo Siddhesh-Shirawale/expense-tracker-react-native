@@ -12,7 +12,7 @@ const ManageExpense = ({ route, navigation }) => {
 
   const expContext = useContext(ExpensesContext);
 
-  const selectedExpense = expContext.expenses.find(
+  const selectedExpense = expContext.expenses?.find(
     (exp) => exp.id === editorExpenseId
   );
 
@@ -37,10 +37,6 @@ const ManageExpense = ({ route, navigation }) => {
     } else {
       try {
         const response = await storeExpense(inputValues);
-        const response1 = storeExpense(inputValues);
-
-        console.log("response", response);
-        console.log("response1", response1);
 
         if (response?.["success"]) {
           console.log(response?.["data"]);
