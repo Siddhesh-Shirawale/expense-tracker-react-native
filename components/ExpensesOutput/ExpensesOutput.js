@@ -7,6 +7,8 @@ import { GlobalStyles } from "../../contants/styles";
 const ExpensesOutput = ({ expenses, expensesPeriod, fallBackText }) => {
   let content = <Text style={styles.infoText}>{fallBackText}</Text>;
 
+  console.log(expenses);
+
   if (expenses?.length > 0) {
     content = <ExpenseList expenses={expenses} />;
   }

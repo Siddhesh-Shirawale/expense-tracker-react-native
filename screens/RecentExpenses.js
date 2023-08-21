@@ -2,20 +2,26 @@ import React, { useContext, useEffect, useState } from "react";
 import { Text, View } from "react-native";
 import ExpensesOutput from "../components/ExpensesOutput/ExpensesOutput";
 import { ExpensesContext } from "./store/expenses-context";
-import { getDateMinusDays } from "../components/ExpensesOutput/util/date";
+import {
+  getDateMinusDays,
+  getFormattedDate2,
+} from "../components/ExpensesOutput/util/date";
 import { getExpenses } from "../util/http";
 
 const RecentExpenses = () => {
-  const [expenses, setExpenses] = useState([]);
   const [errMsg, setErrMsg] = useState("");
-  // const expensesCtx = useContext(ExpensesContext);
 
-  const recentExpenses = expenses?.filter((expense) => {
+  const expensesCtx = useContext(ExpensesContext);
+
+  const recentExpenses = expensesCtx?.["expenses"]?.filter((expense) => {
     const today = new Date();
 
     const date7DaysAgo = getDateMinusDays(today, 7);
 
-    return expense?.date >= date7DaysAgo && expense?.date <= today;
+    return (
+      new Date(expense?.["createdAt"]) >= date7DaysAgo &&
+      new Date(expense?.["createdAt"]) <= today
+    );
   });
 
   const fetchExpenses = async () => {
@@ -23,8 +29,7 @@ const RecentExpenses = () => {
       const response = await getExpenses();
 
       if (response?.["success"]) {
-        console.log(response?.["data"]);
-        // setExpenses(response?.["data"]);
+        expensesCtx.setExpenses(response?.["data"]);
       } else {
         setErrMsg("Something went wrong!");
 

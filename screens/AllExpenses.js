@@ -1,14 +1,45 @@
-import React, { useContext } from "react";
+import React, { useContext, useState, useEffect } from "react";
 
 import ExpensesOutput from "../components/ExpensesOutput/ExpensesOutput";
 import { ExpensesContext } from "./store/expenses-context";
+import { getExpenses } from "../util/http";
 
 const AllExpenses = () => {
-  const expensesCtx = useContext(ExpensesContext);
+  const [expenses, setExpenses] = useState([]);
+  const [errMsg, setErrMsg] = useState("");
+
+  const fetchExpenses = async () => {
+    try {
+      const response = await getExpenses();
+
+      if (response?.["success"]) {
+        setExpenses(response?.["data"]);
+      } else {
+        setErrMsg("Something went wrong!");
+
+        setTimeout(
+          setErrMsg(() => {
+            setErrMsg("");
+          }, 5000)
+        );
+      }
+    } catch (error) {
+      setErrMsg("Something went wrong!");
+
+      setTimeout(
+        setErrMsg(() => {
+          setErrMsg("");
+        }, 5000)
+      );
+    }
+  };
+  useEffect(() => {
+    fetchExpenses();
+  }, []);
 
   return (
     <ExpensesOutput
-      expenses={expensesCtx.expenses}
+      expenses={expenses}
       expensesPeriod="Total"
       fallBackText={"No expenses registered."}
     />

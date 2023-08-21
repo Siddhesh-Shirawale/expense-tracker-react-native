@@ -38,6 +38,8 @@ const ManageExpense = ({ route, navigation }) => {
       try {
         const response = await storeExpense(inputValues);
 
+        console.log("ADD EXP", response);
+
         if (response?.["success"]) {
           console.log(response?.["data"]);
         }
