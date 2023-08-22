@@ -34,6 +34,16 @@ export const getExpenses = async () => {
     return error;
   }
 };
+export const getRecentExpenses = async () => {
+  try {
+    const response = await axios.get(`${endPoint}/api/expense/recent`);
+
+    return response?.["data"];
+  } catch (error) {
+    console.log(error);
+    return error;
+  }
+};
 
 export const updateExpense = async (expenseData) => {
   try {

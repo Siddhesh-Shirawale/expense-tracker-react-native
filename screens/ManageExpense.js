@@ -38,16 +38,13 @@ const ManageExpense = ({ route, navigation }) => {
       try {
         const response = await storeExpense(inputValues);
 
-        console.log("ADD EXP", response);
-
         if (response?.["success"]) {
           console.log(response?.["data"]);
+          expContext.addExpense(response?.["data"]);
         }
       } catch (error) {
         console.log(error);
       }
-
-      expContext.addExpense(inputValues);
     }
     navigation.goBack();
   };

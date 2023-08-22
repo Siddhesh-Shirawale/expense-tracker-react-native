@@ -5,7 +5,7 @@ import ExpenseItem from "./ExpenseItem";
 
 const ExpenseList = ({ expenses }) => {
   return (
-    <View>
+    <View style={{ marginBottom: 50 }}>
       <FlatList
         data={expenses}
         renderItem={({ item }) => <ExpenseItem {...item} />}
