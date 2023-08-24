@@ -1,17 +1,19 @@
-import React, { useContext, useEffect, useState } from "react";
-import { Text, View } from "react-native";
+import React, { useEffect, useState } from "react";
 import ExpensesOutput from "../components/ExpensesOutput/ExpensesOutput";
-import { ExpensesContext } from "./store/expenses-context";
 import {
   getDateMinusDays,
   getFormattedDate2,
 } from "../components/ExpensesOutput/util/date";
-import { getRecentExpenses } from "../util/http";
+import { getExpenses } from "../util/http";
+import { useDispatch, useSelector } from "react-redux";
+import { setExpenses } from "../store/expensesReducer";
 
 const RecentExpenses = () => {
   const [errMsg, setErrMsg] = useState("");
-  const expensesCtx = useContext(ExpensesContext);
-  const [expenses, setExpenses] = useState(expensesCtx?.["expenses"]);
+  const dispatch = useDispatch();
+
+  const expenses = useSelector((state) => state.expenses.expenses);
+  console.log("line 16", expenses);
 
   const recentExpenses = expenses?.filter((expense) => {
     const today = new Date();
@@ -23,13 +25,12 @@ const RecentExpenses = () => {
       new Date(expense?.["createdAt"]) <= today
     );
   });
-
   const fetchExpenses = async () => {
     try {
-      const response = await getRecentExpenses();
+      const response = await getExpenses();
 
       if (response?.["success"]) {
-        expensesCtx.setExpenses(response?.["data"]);
+        dispatch(setExpenses(response?.["data"]));
       } else {
         setErrMsg("Something went wrong!");
 
@@ -51,7 +52,7 @@ const RecentExpenses = () => {
   };
   useEffect(() => {
     fetchExpenses();
-  }, [expensesCtx?.["expenses"]]);
+  }, []);
 
   return (
     <ExpensesOutput

@@ -11,11 +11,17 @@ import { Ionicons } from "@expo/vector-icons";
 import IconButton from "./components/UI/IconButton";
 import ExpensesContextProvider from "./screens/store/expenses-context";
 import { Provider } from "react-redux";
-import store from "./store/store";
+import { configureStore } from "@reduxjs/toolkit";
+import expensesReducer from "./store/expensesReducer";
 
 const Stack = createNativeStackNavigator();
-
 const BottomTab = createBottomTabNavigator();
+
+const store = configureStore({
+  reducer: {
+    expenses: expensesReducer,
+  },
+});
 
 const ExpensesOverview = () => {
   return (
@@ -70,8 +76,8 @@ const ExpensesOverview = () => {
 export default function App() {
   return (
     <>
+      <StatusBar style="light" />
       <Provider store={store}>
-        <StatusBar style="light" />
         <ExpensesContextProvider>
           <NavigationContainer>
             <Stack.Navigator
