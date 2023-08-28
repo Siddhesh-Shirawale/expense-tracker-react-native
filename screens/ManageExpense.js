@@ -1,24 +1,45 @@
-import React, { useContext, useLayoutEffect } from "react";
+import React, {
+  useContext,
+  useDebugValue,
+  useLayoutEffect,
+  useState,
+} from "react";
 import { StyleSheet, View } from "react-native";
 import IconButton from "../components/UI/IconButton";
 import { GlobalStyles } from "../contants/styles";
 import { ExpensesContext } from "./store/expenses-context";
 import ExpenseForm from "../components/ManageExpense/ExpenseForm";
-import { storeExpense } from "../util/http";
+import { deleteExpense, storeExpense } from "../util/http";
+import { addExpense, removeExpense } from "../store/expensesReducer";
+import { useDispatch, useSelector } from "react-redux";
 
 const ManageExpense = ({ route, navigation }) => {
   const editorExpenseId = route.params?.expenseId;
   const isEditing = !!editorExpenseId;
 
-  const expContext = useContext(ExpensesContext);
+  const [errMsg, setErrMsg] = useState("");
 
-  const selectedExpense = expContext.expenses?.find(
-    (exp) => exp.id === editorExpenseId
-  );
+  const expenses = useSelector((state) => state.expenses.expenses);
 
-  const deleteExpense = () => {
-    navigation.goBack();
-    expContext.deleteExpense(editorExpenseId);
+  const selectedExpense = expenses?.find((exp) => exp.id === editorExpenseId);
+
+  const deleteExp = async () => {
+    try {
+      const response = await deleteExpense(editorExpenseId);
+
+      console.log(response);
+
+      if (response?.["success"]) {
+        dispatch(removeExpense(editorExpenseId));
+        navigation.goBack();
+      }
+    } catch (error) {
+      setErrMsg("Something went wrong");
+
+      setTimeout(() => {
+        setErrMsg("");
+      }, 3000);
+    }
   };
 
   useLayoutEffect(() => {
@@ -31,6 +52,8 @@ const ManageExpense = ({ route, navigation }) => {
     navigation.goBack();
   };
 
+  const dispatch = useDispatch();
+
   const confirmHandler = async (inputValues) => {
     if (isEditing) {
       expContext.updateExpense(editorExpenseId, inputValues);
@@ -39,7 +62,7 @@ const ManageExpense = ({ route, navigation }) => {
         const response = await storeExpense(inputValues);
 
         if (response?.["success"]) {
-          expContext.addExpense(response?.["data"]);
+          dispatch(addExpense(response?.["data"]));
         }
       } catch (error) {
         console.log(error);
@@ -63,7 +86,7 @@ const ManageExpense = ({ route, navigation }) => {
             icon="trash"
             color={GlobalStyles.colors.error500}
             size={36}
-            onPress={deleteExpense}
+            onPress={deleteExp}
           />
         </View>
       )}

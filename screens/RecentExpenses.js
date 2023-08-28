@@ -13,7 +13,6 @@ const RecentExpenses = () => {
   const dispatch = useDispatch();
 
   const expenses = useSelector((state) => state.expenses.expenses);
-  console.log("line 16", expenses);
 
   const recentExpenses = expenses?.filter((expense) => {
     const today = new Date();

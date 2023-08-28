@@ -7,15 +7,28 @@ const expensesSlice = createSlice({
   },
   reducers: {
     addExpense: (state, action) => {
-      state.expenses.push(action.payload);
+      const newState = [action.payload, ...state.expenses];
+
+      state.expenses = newState;
     },
     setExpenses: (state, action) => {
-      console.log(action.payload);
       state.expenses = action.payload;
+    },
+    removeExpense: (state, action) => {
+      state.expenses.splice(
+        state.expenses.findIndex((expense) => expense.id === action.payload),
+        1
+      );
+    },
+    updateExpense: (state, action) => {
+      state.expenses.splice(
+        state.expenses.findIndex((expense) => expense.id === action.payload),
+        1
+      );
     },
   },
 });
 
-export const { addExpense, setExpenses } = expensesSlice.actions;
+export const { addExpense, setExpenses, removeExpense } = expensesSlice.actions;
 
 export default expensesSlice.reducer;
