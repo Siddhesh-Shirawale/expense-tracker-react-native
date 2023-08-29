@@ -9,15 +9,22 @@ import IconButton from "../components/UI/IconButton";
 import { GlobalStyles } from "../contants/styles";
 import { ExpensesContext } from "./store/expenses-context";
 import ExpenseForm from "../components/ManageExpense/ExpenseForm";
-import { deleteExpense, storeExpense } from "../util/http";
-import { addExpense, removeExpense } from "../store/expensesReducer";
+import { deleteExpense, storeExpense, updateExpenseData } from "../util/http";
+import {
+  addExpense,
+  removeExpense,
+  updateExpense,
+} from "../store/expensesReducer";
 import { useDispatch, useSelector } from "react-redux";
+import LoadingOverlay from "../components/UI/LoadingOverlay";
+import ErrorOverlay from "../components/UI/ErrorOverlay";
 
 const ManageExpense = ({ route, navigation }) => {
+  const [loader, setLoader] = useState(false);
   const editorExpenseId = route.params?.expenseId;
   const isEditing = !!editorExpenseId;
 
-  const [errMsg, setErrMsg] = useState("");
+  const [err, setErr] = useState(false);
 
   const expenses = useSelector((state) => state.expenses.expenses);
 
@@ -25,19 +32,27 @@ const ManageExpense = ({ route, navigation }) => {
 
   const deleteExp = async () => {
     try {
+      setLoader(true);
       const response = await deleteExpense(editorExpenseId);
 
-      console.log(response);
-
       if (response?.["success"]) {
+        setLoader(false);
         dispatch(removeExpense(editorExpenseId));
         navigation.goBack();
+      } else {
+        setLoader(false);
+        setErr(true);
+
+        setTimeout(() => {
+          setErr(false);
+        }, 3000);
       }
     } catch (error) {
-      setErrMsg("Something went wrong");
+      setLoader(false);
+      setErr(true);
 
       setTimeout(() => {
-        setErrMsg("");
+        setErr(false);
       }, 3000);
     }
   };
@@ -55,21 +70,61 @@ const ManageExpense = ({ route, navigation }) => {
   const dispatch = useDispatch();
 
   const confirmHandler = async (inputValues) => {
+    setLoader(true);
     if (isEditing) {
-      expContext.updateExpense(editorExpenseId, inputValues);
+      let reqBody = {
+        expenseId: editorExpenseId,
+        amount: inputValues?.amount,
+        description: inputValues?.description,
+      };
+      const response = await updateExpenseData(reqBody);
+
+      if (response?.["success"]) {
+        dispatch(updateExpense(response?.["data"]));
+        setLoader(false);
+      } else {
+        setLoader(false);
+        setErr(true);
+
+        setTimeout(() => {
+          setErr(false);
+        }, 3000);
+      }
     } else {
       try {
+        setLoader(true);
         const response = await storeExpense(inputValues);
 
         if (response?.["success"]) {
+          setLoader(false);
           dispatch(addExpense(response?.["data"]));
+        } else {
+          setLoader(false);
+          setErr(true);
+
+          setTimeout(() => {
+            setErr(false);
+          }, 3000);
         }
       } catch (error) {
-        console.log(error);
+        setLoader(false);
+        setErr(true);
+
+        setTimeout(() => {
+          setErr(false);
+        }, 3000);
       }
     }
     navigation.goBack();
   };
+
+  if (loader) {
+    return <LoadingOverlay />;
+  }
+
+  if (err && !loader) {
+    return <ErrorOverlay />;
+  }
 
   return (
     <View style={styles.container}>

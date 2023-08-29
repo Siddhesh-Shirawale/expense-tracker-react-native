@@ -7,14 +7,18 @@ import {
 import { getExpenses } from "../util/http";
 import { useDispatch, useSelector } from "react-redux";
 import { setExpenses } from "../store/expensesReducer";
+import LoadingOverlay from "../components/UI/LoadingOverlay";
+import ErrorOverlay from "../components/UI/ErrorOverlay";
 
 const RecentExpenses = () => {
-  const [errMsg, setErrMsg] = useState("");
-  const dispatch = useDispatch();
+  const [err, setErr] = useState(false);
+  const [loader, setLoader] = useState(false);
 
   const expenses = useSelector((state) => state.expenses.expenses);
+  const [expensesData, setExpensesData] = useState(expenses ?? []);
+  const dispatch = useDispatch();
 
-  const recentExpenses = expenses?.filter((expense) => {
+  const recentExpenses = expensesData?.filter((expense) => {
     const today = new Date();
 
     const date7DaysAgo = getDateMinusDays(today, 7);
@@ -24,35 +28,47 @@ const RecentExpenses = () => {
       new Date(expense?.["createdAt"]) <= today
     );
   });
+
   const fetchExpenses = async () => {
     try {
+      setLoader(true);
       const response = await getExpenses();
 
       if (response?.["success"]) {
         dispatch(setExpenses(response?.["data"]));
+        setLoader(false);
       } else {
-        setErrMsg("Something went wrong!");
-
-        setTimeout(
-          setErrMsg(() => {
-            setErrMsg("");
-          }, 5000)
-        );
+        setErr(true);
+        setLoader(false);
+        setTimeout(() => {
+          setErr(false);
+        }, 3000);
       }
     } catch (error) {
-      setErrMsg("Something went wrong!");
-
-      setTimeout(
-        setErrMsg(() => {
-          setErrMsg("");
-        }, 5000)
-      );
+      setErr(true);
+      setLoader(false);
+      setTimeout(() => {
+        setErr(false);
+      }, 3000);
     }
   };
   useEffect(() => {
     fetchExpenses();
   }, []);
 
+  useEffect(() => {
+    setExpensesData(expenses);
+  }, [expenses]);
+
+  const errorHandler = () => {
+    setErr(false);
+  };
+  if (loader) {
+    return <LoadingOverlay />;
+  }
+  if (err && !loader) {
+    return <ErrorOverlay errorHandler={errorHandler} />;
+  }
   return (
     <ExpensesOutput
       expenses={recentExpenses}

@@ -48,7 +48,7 @@ export const getRecentExpenses = async () => {
 export const updateExpenseData = async (expenseData) => {
   try {
     const response = await axios.put(`${endPoint}/api/expense`, expenseData);
-    return response;
+    return response?.["data"];
   } catch (error) {
     return error;
   }
